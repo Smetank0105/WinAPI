@@ -53,7 +53,8 @@ BOOL CALLBACK DlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		{
 			DialogBoxParam(NULL, MAKEINTRESOURCE(IDD_DIALOG_REDACT), NULL, DlgRedact, 0);
 			HWND hList = GetDlgItem(hwnd, IDC_LIST);
-			SendMessage(hList, LB_ADDSTRING, 0, (LPARAM)sz_buffer);
+			if (SendMessage(hList, LB_FINDSTRING, -1, (LPARAM)sz_buffer) == LB_ERR)
+				SendMessage(hList, LB_ADDSTRING, 0, (LPARAM)sz_buffer);
 		}
 		break;
 		case IDC_BUTTON_DEL:
