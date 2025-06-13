@@ -2,7 +2,7 @@
 #include<cstdio>
 #include"resource.h"
 
-CONST CHAR* G_SZ_VALUES[] = { "Tihs","is","my","first","combo","box","Хорошо","живет","на","свете","Вини-пух"};
+CONST CHAR* G_SZ_VALUES[] = { "This","is","my","first","combo","box","Хорошо","живет","на","свете","Вини-пух"};
 
 BOOL CALLBACK DlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
