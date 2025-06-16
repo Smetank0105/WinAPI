@@ -1,5 +1,6 @@
 ﻿#include<Windows.h>
 #include<cstdio>
+#include"resource.h"
 
 CONST CHAR g_sz_CLASS_NAME[] = "My First Window";
 
@@ -17,9 +18,19 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, IN
 	wClass.cbClsExtra = 0;
 
 	//Внешнее оформление окна
-	wClass.hIcon = LoadIcon(NULL, IDI_APPLICATION);
-	wClass.hIconSm = LoadIcon(NULL, IDI_APPLICATION);	//Sm - small
-	wClass.hCursor = LoadCursor(NULL, IDC_ARROW);
+	wClass.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON_ATOM));
+	wClass.hIconSm = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON_BEER));	//Sm - small
+	//wClass.hIcon = (HICON)LoadImage(hInstance, "Atom.ico", IMAGE_ICON, LR_DEFAULTSIZE, LR_DEFAULTSIZE, LR_LOADFROMFILE);
+	//wClass.hIconSm = (HICON)LoadImage(hInstance, "Beer.ico", IMAGE_ICON, LR_DEFAULTSIZE, LR_DEFAULTSIZE, LR_LOADFROMFILE);
+	//wClass.hCursor = LoadCursor(hInstance, MAKEINTRESOURCE(IDC_CURSOR));
+	wClass.hCursor = (HCURSOR)LoadImage
+	(
+		hInstance, "Cursors\\Working In Background.ani",
+		IMAGE_CURSOR,
+		LR_DEFAULTSIZE,
+		LR_DEFAULTSIZE,
+		LR_LOADFROMFILE
+	);
 	wClass.hbrBackground = (HBRUSH)COLOR_WINDOW;
 
 	wClass.hInstance = hInstance;
@@ -44,7 +55,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, IN
 	(
 		NULL,									//ExStyle
 		g_sz_CLASS_NAME,						//ClassName
-		g_sz_CLASS_NAME,								//WindowName (Title)
+		g_sz_CLASS_NAME,						//WindowName (Title)
 		WS_OVERLAPPEDWINDOW,					//Такой стиль задается для всех главных окон. Это окно будет родительским для других окон приложения
 		window_start_x, window_start_y,			//Position
 		window_width, window_height,			//Size
