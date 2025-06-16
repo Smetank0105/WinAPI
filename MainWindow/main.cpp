@@ -35,18 +35,19 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, IN
 	//2) Создание окна:
 	INT screenWidth = GetSystemMetrics(SM_CXSCREEN);
 	INT screenHeight = GetSystemMetrics(SM_CYSCREEN);
-	CONST INT size = 256;
-	CHAR sz_title[size] = {};
-	sprintf(sz_title, "Размер окна %ix%i пикселей, положение левого верхнего угла: X {%i}, Y {%i}", screenWidth*3/4, screenHeight * 3 / 4, screenWidth/8, screenHeight/8);
+	INT window_width = screenWidth * 3 / 4;
+	INT window_height = screenHeight * 3 / 4;
+	INT window_start_x = screenWidth / 8;
+	INT window_start_y = screenHeight / 8;
 
 	HWND hwnd = CreateWindowEx
 	(
-		NULL,	//ExStyle
+		NULL,									//ExStyle
 		g_sz_CLASS_NAME,						//ClassName
-		sz_title,						//WindowName (Title)
+		g_sz_CLASS_NAME,								//WindowName (Title)
 		WS_OVERLAPPEDWINDOW,					//Такой стиль задается для всех главных окон. Это окно будет родительским для других окон приложения
-		screenWidth/8, screenHeight/8,			//Position
-		screenWidth*3/4, screenHeight*3/4,		//Size
+		window_start_x, window_start_y,			//Position
+		window_width, window_height,			//Size
 		NULL,									//ParentWindow
 		NULL,									//Строка меню для главного окна, или же ID_-ресурса для дочернего окна
 		hInstance,								//Это экземпляр *.exe-файла нашей программы
@@ -75,6 +76,25 @@ INT WINAPI WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	switch (uMsg)
 	{
 	case WM_CREATE:
+		break;
+	case WM_MOVE:
+	case WM_SIZE:
+	{
+		RECT window_rect;
+		GetWindowRect(hwnd, &window_rect);
+		INT window_width = window_rect.right - window_rect.left;
+		INT window_height = window_rect.bottom - window_rect.top;
+		CONST INT size = 256;
+		CHAR sz_title[size] = {};
+		sprintf(
+			sz_title,
+			"%s - Position:%ix%i, Size:%ix%i",
+			g_sz_CLASS_NAME,
+			window_rect.left, window_rect.top,
+			window_width, window_height
+			);
+		SendMessage(hwnd, WM_SETTEXT, 0 , (LPARAM)sz_title);
+	}
 		break;
 	case WM_COMMAND:
 		break;
