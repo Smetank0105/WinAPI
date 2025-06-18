@@ -26,7 +26,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, IN
 	wClass.lpszClassName = g_sz_CLASS_NAME;
 	wClass.lpfnWndProc = (WNDPROC)WndProc;
 
-	if (RegisterClassEx(&wClass) == NULL) {
+	if (!RegisterClassEx(&wClass)) {
 		MessageBox(NULL, "Class Registration Error", "", MB_OK | MB_ICONERROR);
 		return 0;
 	}
@@ -37,7 +37,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, IN
 		NULL,
 		g_sz_CLASS_NAME,
 		g_sz_CLASS_NAME,
-		WS_OVERLAPPED,
+		WS_OVERLAPPEDWINDOW,
 		CW_USEDEFAULT,CW_USEDEFAULT,
 		CW_USEDEFAULT,CW_USEDEFAULT,
 		NULL,
