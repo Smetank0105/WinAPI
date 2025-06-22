@@ -170,9 +170,9 @@ INT WINAPI WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			else
 				szDigit[0] = LOWORD(wParam) - IDC_BUTTON_0 + '0';
 			SendMessage(hEditDisplay, WM_GETTEXT, g_SIZE, (LPARAM)szDisplay);
-			if (szDisplay[0] == '0' && szDisplay[1] != '.')szDisplay[0] = 0;
+			if (szDisplay[0] == '0' && szDisplay[1] != '.') szDisplay[0] = 0;
 			if (szDigit[0] == '.' && strchr(szDisplay, '.') && !strpbrk(szDisplay, "+-*/"))break;
-			if (szDigit[0] == '.' && strpbrk(szDisplay, "+-*/") && strchr(strpbrk(szDisplay, "+-*/"), '.'))break;
+			if (szDigit[0] == '.' && strpbrk(szDisplay, "+-*/") && strchr(strpbrk(szDisplay + 1, "+-*/"), '.'))break;
 			strcat(szDisplay, szDigit);
 			SendMessage(hEditDisplay, WM_SETTEXT, 0, (LPARAM)szDisplay);
 		}
