@@ -1,4 +1,5 @@
 #include<Windows.h>
+#include<sstream>
 #include"resource.h"
 
 CONST CHAR g_sz_CLASS_NAME[] = "MyCalc";
@@ -23,6 +24,8 @@ CONST INT g_i_WINDOW_HEIGHT = (g_i_DISPLAY_HEIGHT + g_i_INTERVAL) + g_i_BUTTON_S
 CONST INT g_SIZE = 256;
 
 INT WINAPI WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+
+void Calculate(CHAR* str);
 
 INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, INT nCmdShow)
 {
@@ -91,7 +94,7 @@ INT WINAPI WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		HWND hEditDisplay = CreateWindowEx
 		(
 			NULL, "Edit", "0",
-			WS_CHILD | WS_VISIBLE | WS_BORDER | ES_RIGHT,
+			WS_CHILD | WS_VISIBLE | WS_BORDER | ES_RIGHT | ES_READONLY,
 			g_i_START_X, g_i_START_Y,
 			g_i_DISPLAY_WIDTH, g_i_DISPLAY_HEIGHT,
 			hwnd, (HMENU)IDC_EDIT_DISPLAY, GetModuleHandle(NULL), NULL
@@ -137,9 +140,9 @@ INT WINAPI WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			(
 				NULL, "Button", g_sz_OPERATIONS[i],
 				WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
-				g_i_BUTTON_START_X+g_i_BUTTON_SPACE * 3, g_i_BUTTON_START_Y + g_i_BUTTON_SPACE * (3 - i),
+				g_i_BUTTON_START_X + g_i_BUTTON_SPACE * 3, g_i_BUTTON_START_Y + g_i_BUTTON_SPACE * (3 - i),
 				g_i_BUTTON_SIZE, g_i_BUTTON_SIZE,
-				hwnd, (HMENU)(IDC_BUTTON_PLUS)+i, GetModuleHandle(NULL), NULL
+				hwnd, (HMENU)(IDC_BUTTON_PLUS + i), GetModuleHandle(NULL), NULL
 			);
 		}
 		for (int i = 0; i < 3; i++)
@@ -168,12 +171,31 @@ INT WINAPI WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				szDigit[0] = LOWORD(wParam) - IDC_BUTTON_0 + '0';
 			SendMessage(hEditDisplay, WM_GETTEXT, g_SIZE, (LPARAM)szDisplay);
 			if (szDisplay[0] == '0' && szDisplay[1] != '.')szDisplay[0] = 0;
-			if (szDigit[0]=='.' && strchr(szDisplay, '.'))break;
+			if (szDigit[0] == '.' && strchr(szDisplay, '.') && !strpbrk(szDisplay, "+-*/"))break;
+			if (szDigit[0] == '.' && strpbrk(szDisplay, "+-*/") && strchr(strpbrk(szDisplay, "+-*/"), '.'))break;
+			strcat(szDisplay, szDigit);
+			SendMessage(hEditDisplay, WM_SETTEXT, 0, (LPARAM)szDisplay);
+		}
+		if (LOWORD(wParam) >= IDC_BUTTON_PLUS && LOWORD(wParam) <= IDC_BUTTON_EQUAL)
+		{
+			SendMessage(hEditDisplay, WM_GETTEXT, g_SIZE, (LPARAM)szDisplay);
+			if (szDisplay[strlen(szDisplay) - 1] == '.'
+				|| szDisplay[strlen(szDisplay) - 1] == '+'
+				|| szDisplay[strlen(szDisplay) - 1] == '-'
+				|| szDisplay[strlen(szDisplay) - 1] == '*'
+				|| szDisplay[strlen(szDisplay) - 1] == '/')break;
+			if (LOWORD(wParam) == IDC_BUTTON_CLR) { SendMessage(hEditDisplay, WM_SETTEXT, 0, (LPARAM)"0"); break; }
+			if (LOWORD(wParam) == IDC_BUTTON_PLUS)szDigit[0] = '+';
+			if (LOWORD(wParam) == IDC_BUTTON_MINUS)szDigit[0] = '-';
+			if (LOWORD(wParam) == IDC_BUTTON_ASTER)szDigit[0] = '*';
+			if (LOWORD(wParam) == IDC_BUTTON_SLASH)szDigit[0] = '/';
+			if (LOWORD(wParam) == IDC_BUTTON_BSP && strlen(szDisplay) > 0)szDisplay[strlen(szDisplay) - 1] = '\0';
+			Calculate(szDisplay);
 			strcat(szDisplay, szDigit);
 			SendMessage(hEditDisplay, WM_SETTEXT, 0, (LPARAM)szDisplay);
 		}
 	}
-		break;
+	break;
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		break;
@@ -184,4 +206,21 @@ INT WINAPI WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		return DefWindowProc(hwnd, uMsg, wParam, lParam);
 	}
 	return FALSE;
+}
+
+void Calculate(CHAR* str)
+{
+	std::stringstream ss(str);
+	double a = 0.0, b = 0.0, c = 0.0;
+	CHAR key = '+';
+	ss >> a >> key >> b;
+	switch (key)
+	{
+	case '+': c = a + b; break;
+	case '-': c = a - b; break;
+	case '*': c = a * b; break;
+	case '/': c = a / b; break;
+	default: break;
+	}
+	sprintf(str, "%.9g", c);
 }
