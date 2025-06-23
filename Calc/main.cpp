@@ -1,4 +1,6 @@
 #include<Windows.h>
+#include<float.h>
+#include<stdio.h>
 #include"resource.h"
 
 CONST CHAR g_sz_CLASS_NAME[] = "MyCalc";
@@ -84,6 +86,12 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, IN
 
 INT WINAPI WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
+	static DOUBLE a = DBL_MIN;
+	static DOUBLE b = DBL_MIN;
+	static INT operation = 0;
+	static BOOL input = FALSE;				//Пользователь ввёл число
+	static BOOL input_operation = FALSE;	//Пользователь ввёл знак операции
+
 	switch (uMsg)
 	{
 	case WM_CREATE:
@@ -137,9 +145,9 @@ INT WINAPI WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			(
 				NULL, "Button", g_sz_OPERATIONS[i],
 				WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
-				g_i_BUTTON_START_X+g_i_BUTTON_SPACE * 3, g_i_BUTTON_START_Y + g_i_BUTTON_SPACE * (3 - i),
+				g_i_BUTTON_START_X + g_i_BUTTON_SPACE * 3, g_i_BUTTON_START_Y + g_i_BUTTON_SPACE * (3 - i),
 				g_i_BUTTON_SIZE, g_i_BUTTON_SIZE,
-				hwnd, (HMENU)(IDC_BUTTON_PLUS)+i, GetModuleHandle(NULL), NULL
+				hwnd, (HMENU)(IDC_BUTTON_PLUS + i), GetModuleHandle(NULL), NULL
 			);
 		}
 		for (int i = 0; i < 3; i++)
@@ -162,18 +170,62 @@ INT WINAPI WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		HWND hEditDisplay = GetDlgItem(hwnd, IDC_EDIT_DISPLAY);
 		if (LOWORD(wParam) >= IDC_BUTTON_0 && LOWORD(wParam) <= IDC_BUTTON_POINT)
 		{
+			if (input == FALSE)SendMessage(hEditDisplay, WM_SETTEXT, 0, (LPARAM)"0");
 			if (LOWORD(wParam) == IDC_BUTTON_POINT)
 				szDigit[0] = '.';
 			else
 				szDigit[0] = LOWORD(wParam) - IDC_BUTTON_0 + '0';
 			SendMessage(hEditDisplay, WM_GETTEXT, g_SIZE, (LPARAM)szDisplay);
 			if (szDisplay[0] == '0' && szDisplay[1] != '.')szDisplay[0] = 0;
-			if (szDigit[0]=='.' && strchr(szDisplay, '.'))break;
+			if (szDigit[0] == '.' && strchr(szDisplay, '.'))break;
 			strcat(szDisplay, szDigit);
+			SendMessage(hEditDisplay, WM_SETTEXT, 0, (LPARAM)szDisplay);
+			input = TRUE;
+		}
+		if (LOWORD(wParam) >= IDC_BUTTON_PLUS && LOWORD(wParam) <= IDC_BUTTON_SLASH)
+		{
+			SendMessage(hEditDisplay, WM_GETTEXT, g_SIZE, (LPARAM)szDisplay);
+			if (input && a == DBL_MIN)a = atof(szDisplay);
+			if (input) b = atof(szDisplay);
+			input = FALSE;
+			SendMessage(hwnd, WM_COMMAND, IDC_BUTTON_EQUAL, 0);		//выполняем предыдущую операцию
+			operation = LOWORD(wParam);								//и только после этого запоминаем введенную операцию
+			input_operation = TRUE;
+		}
+		if (LOWORD(wParam) == IDC_BUTTON_BSP)
+		{
+			SendMessage(hEditDisplay, WM_GETTEXT, g_SIZE, (LPARAM)szDisplay);
+			if (strlen(szDisplay) > 1) szDisplay[strlen(szDisplay) - 1] = 0;
+			else szDisplay[0] = '0';
+			SendMessage(hEditDisplay, WM_SETTEXT, 0, (LPARAM)szDisplay);
+		}
+		if (LOWORD(wParam) == IDC_BUTTON_CLR)
+		{
+			a = b = DBL_MIN;
+			operation = 0;
+			input = input_operation = FALSE;
+			SendMessage(hEditDisplay, WM_SETTEXT, 0, (LPARAM)"0");
+		}
+		if (LOWORD(wParam) == IDC_BUTTON_EQUAL)
+		{
+			SendMessage(hEditDisplay, WM_GETTEXT, g_SIZE, (LPARAM)szDisplay);
+			if (input && a == DBL_MIN)a = atof(szDisplay);
+			if (input) b = atof(szDisplay);
+			if (a == DBL_MIN)break;
+			input = FALSE;
+			switch (operation)
+			{
+			case IDC_BUTTON_PLUS: a += b; break;
+			case IDC_BUTTON_MINUS: a -= b; break;
+			case IDC_BUTTON_ASTER: a *= b; break;
+			case IDC_BUTTON_SLASH: a /= b; break;
+			}
+			input_operation = FALSE;
+			sprintf(szDisplay, "%g", a);
 			SendMessage(hEditDisplay, WM_SETTEXT, 0, (LPARAM)szDisplay);
 		}
 	}
-		break;
+	break;
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		break;
