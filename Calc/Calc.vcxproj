@@ -148,7 +148,25 @@
     <ResourceCompile Include="Resource.rc" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="Ico\bsp.ico" />
     <Image Include="Ico\calc.ico" />
+    <Image Include="Ico\clear.ico" />
+    <Image Include="Ico\comma.ico" />
+    <Image Include="Ico\division.ico" />
+    <Image Include="Ico\eight.ico" />
+    <Image Include="Ico\equal.ico" />
+    <Image Include="Ico\five.ico" />
+    <Image Include="Ico\four.ico" />
+    <Image Include="Ico\minus.ico" />
+    <Image Include="Ico\multiply.ico" />
+    <Image Include="Ico\nine.ico" />
+    <Image Include="Ico\one.ico" />
+    <Image Include="Ico\plus.ico" />
+    <Image Include="Ico\seven.ico" />
+    <Image Include="Ico\six.ico" />
+    <Image Include="Ico\three.ico" />
+    <Image Include="Ico\two.ico" />
+    <Image Include="Ico\zero.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

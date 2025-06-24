@@ -33,5 +33,59 @@
     <Image Include="Ico\calc.ico">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="Ico\one.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Ico\two.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Ico\three.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Ico\four.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Ico\five.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Ico\six.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Ico\seven.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Ico\eight.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Ico\nine.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Ico\zero.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Ico\comma.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Ico\plus.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Ico\minus.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Ico\multiply.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Ico\division.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Ico\bsp.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Ico\clear.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Ico\equal.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

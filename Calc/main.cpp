@@ -104,6 +104,14 @@ INT WINAPI WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			g_i_DISPLAY_WIDTH, g_i_DISPLAY_HEIGHT,
 			hwnd, (HMENU)IDC_EDIT_DISPLAY, GetModuleHandle(NULL), NULL
 		);
+		CreateWindowEx
+		(
+			NULL, "Button", "0",
+			WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | BS_ICON,
+			g_i_BUTTON_START_X, g_i_BUTTON_START_Y + (g_i_BUTTON_SPACE) * 3,
+			g_i_BUTTON_SIZE_DOUBLE, g_i_BUTTON_SIZE,
+			hwnd, (HMENU)IDC_BUTTON_0, GetModuleHandle(NULL), NULL
+		);
 		INT iDigit = IDC_BUTTON_1;
 		CHAR szDigit[2] = {};
 		for (int i = 0; i <= 6; i += 3)
@@ -114,7 +122,7 @@ INT WINAPI WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				CreateWindowEx
 				(
 					NULL, "Button", szDigit,
-					WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
+					WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | BS_ICON,
 					g_i_BUTTON_START_X + (g_i_BUTTON_SPACE)*j, g_i_BUTTON_START_Y + (g_i_BUTTON_SPACE)*i / 3,
 					g_i_BUTTON_SIZE, g_i_BUTTON_SIZE,
 					hwnd, (HMENU)iDigit, GetModuleHandle(NULL), NULL
@@ -124,16 +132,8 @@ INT WINAPI WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		}
 		CreateWindowEx
 		(
-			NULL, "Button", "0",
-			WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
-			g_i_BUTTON_START_X, g_i_BUTTON_START_Y + (g_i_BUTTON_SPACE) * 3,
-			g_i_BUTTON_SIZE_DOUBLE, g_i_BUTTON_SIZE,
-			hwnd, (HMENU)IDC_BUTTON_0, GetModuleHandle(NULL), NULL
-		);
-		CreateWindowEx
-		(
 			NULL, "Button", ".",
-			WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
+			WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | BS_ICON,
 			g_i_BUTTON_START_X + g_i_BUTTON_SPACE * 2, g_i_BUTTON_START_Y + g_i_BUTTON_SPACE * 3,
 			g_i_BUTTON_SIZE, g_i_BUTTON_SIZE,
 			hwnd, (HMENU)IDC_BUTTON_POINT, GetModuleHandle(NULL), NULL
@@ -144,7 +144,7 @@ INT WINAPI WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			CreateWindowEx
 			(
 				NULL, "Button", g_sz_OPERATIONS[i],
-				WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
+				WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | BS_ICON,
 				g_i_BUTTON_START_X + g_i_BUTTON_SPACE * 3, g_i_BUTTON_START_Y + g_i_BUTTON_SPACE * (3 - i),
 				g_i_BUTTON_SIZE, g_i_BUTTON_SIZE,
 				hwnd, (HMENU)(IDC_BUTTON_PLUS + i), GetModuleHandle(NULL), NULL
@@ -155,11 +155,15 @@ INT WINAPI WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			CreateWindowEx
 			(
 				NULL, "Button", g_sz_EDIT[i],
-				WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
+				WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | BS_ICON,
 				g_i_BUTTON_START_X + g_i_BUTTON_SPACE * 4, g_i_BUTTON_START_Y + g_i_BUTTON_SPACE * (i),
 				g_i_BUTTON_SIZE, i < 2 ? g_i_BUTTON_SIZE : g_i_BUTTON_SIZE_DOUBLE,
 				hwnd, (HMENU)(IDC_BUTTON_BSP + i), GetModuleHandle(NULL), NULL
 			);
+		}
+		for (INT i = 0; i < 18; i++)
+		{
+			SendMessage(GetDlgItem(hwnd, IDC_BUTTON_0 + i), BM_SETIMAGE, IMAGE_ICON, (LPARAM)LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_ICON1 + i)));
 		}
 	}
 	break;

@@ -13,7 +13,7 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// Russian (Russia) resources
+// Русский (Россия) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_RUS)
 LANGUAGE LANG_RUSSIAN, SUBLANG_DEFAULT
@@ -54,7 +54,43 @@ END
 // remains consistent on all systems.
 IDI_ICON                ICON                    "Ico\\calc.ico"
 
-#endif    // Russian (Russia) resources
+IDI_ICON1               ICON                    "Ico\\zero.ico"
+
+IDI_ICON2               ICON                    "Ico\\one.ico"
+
+IDI_ICON3               ICON                    "Ico\\two.ico"
+
+IDI_ICON4               ICON                    "Ico\\three.ico"
+
+IDI_ICON5               ICON                    "Ico\\four.ico"
+
+IDI_ICON6               ICON                    "Ico\\five.ico"
+
+IDI_ICON7               ICON                    "Ico\\six.ico"
+
+IDI_ICON8               ICON                    "Ico\\seven.ico"
+
+IDI_ICON9               ICON                    "Ico\\eight.ico"
+
+IDI_ICON10              ICON                    "Ico\\nine.ico"
+
+IDI_ICON11              ICON                    "Ico\\comma.ico"
+
+IDI_ICON12              ICON                    "Ico\\plus.ico"
+
+IDI_ICON13              ICON                    "Ico\\minus.ico"
+
+IDI_ICON14              ICON                    "Ico\\multiply.ico"
+
+IDI_ICON15              ICON                    "Ico\\division.ico"
+
+IDI_ICON16              ICON                    "Ico\\bsp.ico"
+
+IDI_ICON17              ICON                    "Ico\\clear.ico"
+
+IDI_ICON18              ICON                    "Ico\\equal.ico"
+
+#endif    // Русский (Россия) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
