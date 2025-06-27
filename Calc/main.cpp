@@ -172,7 +172,7 @@ INT WINAPI WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			);
 		}
 		//SetSkin(hwnd, "square_blue");
-		SetSkinFormDLL(hwnd, "square_blue");
+		SetSkinFormDLL(hwnd, "metal_mistral");
 		//SendMessage(GetDlgItem(hwnd, IDC_BUTTON_0), BM_SETIMAGE, IMAGE_BITMAP, (LPARAM)LoadImage(NULL,"BMP\\0.bmp", IMAGE_BITMAP, LR_DEFAULTSIZE,LR_DEFAULTSIZE,LR_LOADFROMFILE));
 		//CHAR sz_error[32] = {};
 		//sprintf(sz_error, "%i", GetLastError());		//GetLastError - достает из очереди код последней ошибки
@@ -416,7 +416,7 @@ VOID SetSkin(HWND hwnd, CONST CHAR sz_skin[])
 
 VOID SetSkinFormDLL(HWND hwnd, CONST CHAR sz_skin[])
 {
-	HMODULE hButtonsModule = LoadLibrary("Buttons.dll");
+	HMODULE hButtonsModule = LoadLibrary(sz_skin);	//ѕринципиально важно, что бы *.dll-фаил находилс€ в одном каталоге с нашим *.exe-файлом
 	for (int i = IDC_BUTTON_0; i <= IDC_BUTTON_EQUAL; i++)
 	{
 		HBITMAP bmpButton = (HBITMAP)LoadImage
