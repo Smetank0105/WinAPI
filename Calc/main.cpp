@@ -171,16 +171,8 @@ INT WINAPI WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				hwnd, (HMENU)(IDC_BUTTON_BSP + i), GetModuleHandle(NULL), NULL
 			);
 		}
-		//SetSkin(hwnd, "square_blue");
-		SetSkinFormDLL(hwnd, "metal_mistral");
-		//SendMessage(GetDlgItem(hwnd, IDC_BUTTON_0), BM_SETIMAGE, IMAGE_BITMAP, (LPARAM)LoadImage(NULL,"BMP\\0.bmp", IMAGE_BITMAP, LR_DEFAULTSIZE,LR_DEFAULTSIZE,LR_LOADFROMFILE));
-		//CHAR sz_error[32] = {};
-		//sprintf(sz_error, "%i", GetLastError());		//GetLastError - достает из очереди код последней ошибки
-		//MessageBox(hwnd, sz_error, "", MB_OK);
-		//for (INT i = 0; i < 18; i++)
-		//{
-		//	SendMessage(GetDlgItem(hwnd, IDC_BUTTON_0 + i), BM_SETIMAGE, IMAGE_ICON, (LPARAM)LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_ICON1 + i)));
-		//}
+		SetSkin(hwnd, "square_blue");
+		//SetSkinFormDLL(hwnd, "metal_mistral");
 	}
 	break;
 	case WM_COMMAND:
@@ -403,7 +395,12 @@ VOID SetSkin(HWND hwnd, CONST CHAR sz_skin[])
 
 		if (bmpIcon == NULL)
 		{
-			SendMessage(GetDlgItem(hwnd, i), BM_SETSTYLE, (WPARAM)(WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON), TRUE);
+			std::cout << "SetButtonStyle(): " << std::endl;
+			SendMessage(GetDlgItem(hwnd, i), BM_SETSTYLE, 0, TRUE);
+			PrintLastError(GetLastError());
+			SendMessage(GetDlgItem(hwnd, i), BM_SETSTYLE, WPARAM(WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON), TRUE);
+			PrintLastError(GetLastError());
+			std::cout << delimiter << std::endl;
 			continue;
 		}
 
