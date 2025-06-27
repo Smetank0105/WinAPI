@@ -9,6 +9,7 @@ CONST CHAR g_sz_CLASS_NAME[] = "MyCalc";
 
 CONST CHAR* g_sz_OPERATIONS[] = { "+","-","*","/" };
 CONST CHAR* g_sz_EDIT[] = { "<-","C","=" };
+CONST CHAR* g_sz_BUTTON_FILENAMES[] = { "point","plus","minus","aster","slash","bsp","clr","equal" };
 
 CONST INT g_i_BUTTON_SIZE = 50;
 CONST INT g_i_INTERVAL = 1;
@@ -388,14 +389,15 @@ VOID SetSkin(HWND hwnd, CONST CHAR sz_skin[])
 	for (int i = IDC_BUTTON_0; i <= IDC_BUTTON_EQUAL; i++)
 	{
 		if (i <= IDC_BUTTON_9) sprintf(sz_filename, "BMP\\%s\\button_%i.bmp", sz_skin, i - IDC_BUTTON_0);
-		if (i == IDC_BUTTON_POINT) sprintf(sz_filename, "BMP\\%s\\button_point.bmp", sz_skin);
-		if (i == IDC_BUTTON_PLUS) sprintf(sz_filename, "BMP\\%s\\button_plus.bmp", sz_skin);
-		if (i == IDC_BUTTON_MINUS) sprintf(sz_filename, "BMP\\%s\\button_minus.bmp", sz_skin);
-		if (i == IDC_BUTTON_ASTER) sprintf(sz_filename, "BMP\\%s\\button_aster.bmp", sz_skin);
-		if (i == IDC_BUTTON_SLASH) sprintf(sz_filename, "BMP\\%s\\button_slash.bmp", sz_skin);
-		if (i == IDC_BUTTON_BSP) sprintf(sz_filename, "BMP\\%s\\button_bsp.bmp", sz_skin);
-		if (i == IDC_BUTTON_CLR) sprintf(sz_filename, "BMP\\%s\\button_clr.bmp", sz_skin);
-		if (i == IDC_BUTTON_EQUAL) sprintf(sz_filename, "BMP\\%s\\button_equal.bmp", sz_skin);
+		//if (i == IDC_BUTTON_POINT) sprintf(sz_filename, "BMP\\%s\\button_point.bmp", sz_skin);
+		//if (i == IDC_BUTTON_PLUS) sprintf(sz_filename, "BMP\\%s\\button_plus.bmp", sz_skin);
+		//if (i == IDC_BUTTON_MINUS) sprintf(sz_filename, "BMP\\%s\\button_minus.bmp", sz_skin);
+		//if (i == IDC_BUTTON_ASTER) sprintf(sz_filename, "BMP\\%s\\button_aster.bmp", sz_skin);
+		//if (i == IDC_BUTTON_SLASH) sprintf(sz_filename, "BMP\\%s\\button_slash.bmp", sz_skin);
+		//if (i == IDC_BUTTON_BSP) sprintf(sz_filename, "BMP\\%s\\button_bsp.bmp", sz_skin);
+		//if (i == IDC_BUTTON_CLR) sprintf(sz_filename, "BMP\\%s\\button_clr.bmp", sz_skin);
+		//if (i == IDC_BUTTON_EQUAL) sprintf(sz_filename, "BMP\\%s\\button_equal.bmp", sz_skin);
+		if (i > IDC_BUTTON_9 && i <= IDC_BUTTON_EQUAL) sprintf(sz_filename, "BMP\\%s\\button_%s.bmp", sz_skin, g_sz_BUTTON_FILENAMES[i - IDC_BUTTON_POINT]);
 		HBITMAP bmpIcon = (HBITMAP)LoadImage
 		(
 			GetModuleHandle(NULL),
@@ -404,6 +406,12 @@ VOID SetSkin(HWND hwnd, CONST CHAR sz_skin[])
 			i == IDC_BUTTON_0 ? g_i_BUTTON_SIZE_DOUBLE : g_i_BUTTON_SIZE,
 			i == IDC_BUTTON_EQUAL ? g_i_BUTTON_SIZE_DOUBLE : g_i_BUTTON_SIZE,
 			LR_LOADFROMFILE);
+
+		//if (bmpIcon == NULL)
+		//{
+		//	SendMessage(GetDlgItem(hwnd, i), BM_SETSTYLE, WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, TRUE);
+		//	continue;
+		//}
 
 		PrintLastError(GetLastError());
 
