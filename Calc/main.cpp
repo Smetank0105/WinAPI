@@ -3,6 +3,9 @@
 #include<stdio.h>
 #include<iostream>
 #include"resource.h"
+#include"LastErrorStaticLibrary.h"
+
+namespace LESL = LastErrorStaticLibrary;
 
 #define delimiter "\n----------------------------------------------------------------------\n"
 CONST CHAR g_sz_CLASS_NAME[] = "MyCalc";
@@ -26,6 +29,8 @@ CONST INT g_i_WINDOW_WIDTH = g_i_DISPLAY_WIDTH + 2 * g_i_BUTTON_START_X + 16;
 CONST INT g_i_WINDOW_HEIGHT = (g_i_DISPLAY_HEIGHT + g_i_INTERVAL) + g_i_BUTTON_SPACE * 4 + g_i_START_Y * 2 + 24 + 16;
 
 CONST INT g_SIZE = 256;
+
+HFONT hFont;
 
 INT WINAPI WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 VOID SetSkin(HWND hwnd, CONST CHAR sz_skin[]);
@@ -171,8 +176,20 @@ INT WINAPI WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				hwnd, (HMENU)(IDC_BUTTON_BSP + i), GetModuleHandle(NULL), NULL
 			);
 		}
-		SetSkin(hwnd, "square_blue");
-		//SetSkinFormDLL(hwnd, "metal_mistral");
+		//SetSkin(hwnd, "square_blue");
+		SetSkinFormDLL(hwnd, "hand_maid");
+
+		AddFontResourceEx("Fonts\\digital-7.ttf", FR_PRIVATE, NULL);
+		hFont = CreateFont
+		(
+			0,0,0,0,FW_NORMAL,
+			FALSE, FALSE, FALSE, DEFAULT_CHARSET,
+			OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,DEFAULT_QUALITY,
+			FF_DONTCARE,
+			"Digital-7"
+		);
+		SendMessage(hEditDisplay,WM_SETFONT,(WPARAM)hFont,TRUE);
+
 	}
 	break;
 	case WM_COMMAND:
@@ -344,6 +361,8 @@ INT WINAPI WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 	break;
 	case WM_DESTROY:
+		DeleteObject(hFont);
+		RemoveFontResourceEx("Fonts\\digital-7.ttf", FR_PRIVATE, NULL);
 		FreeConsole();
 		PostQuitMessage(0);
 		break;
@@ -355,27 +374,29 @@ INT WINAPI WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	}
 	return FALSE;
 }
-LPSTR FormatLastError(DWORD dwErrorID)
-{
-	LPSTR lpszMessage = NULL;
-	FormatMessage
-	(
-		FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-		NULL,
-		dwErrorID,
-		MAKELANGID(LANG_NEUTRAL, SUBLANG_RUSSIAN_RUSSIA),
-		(LPSTR)&lpszMessage,
-		NULL,
-		NULL
-	);
-	return lpszMessage;
-}
-VOID PrintLastError(DWORD dwErrorID)
-{
-	LPSTR lpszMessage = FormatLastError(GetLastError());
-	std::cout << lpszMessage << std::endl;
-	LocalFree(lpszMessage);
-}
+
+//LPSTR FormatLastError(DWORD dwErrorID)
+//{
+//	LPSTR lpszMessage = NULL;
+//	FormatMessage
+//	(
+//		FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+//		NULL,
+//		dwErrorID,
+//		MAKELANGID(LANG_NEUTRAL, SUBLANG_RUSSIAN_RUSSIA),
+//		(LPSTR)&lpszMessage,
+//		NULL,
+//		NULL
+//	);
+//	return lpszMessage;
+//}
+//VOID PrintLastError(DWORD dwErrorID)
+//{
+//	LPSTR lpszMessage = FormatLastError(GetLastError());
+//	std::cout << lpszMessage << std::endl;
+//	LocalFree(lpszMessage);
+//}
+
 VOID SetSkin(HWND hwnd, CONST CHAR sz_skin[])
 {
 	std::cout << "SetSkin()" << std::endl;
@@ -397,14 +418,14 @@ VOID SetSkin(HWND hwnd, CONST CHAR sz_skin[])
 		{
 			std::cout << "SetButtonStyle(): " << std::endl;
 			SendMessage(GetDlgItem(hwnd, i), BM_SETSTYLE, 0, TRUE);
-			PrintLastError(GetLastError());
+			LESL::LastError::PrintLastError(GetLastError());
 			SendMessage(GetDlgItem(hwnd, i), BM_SETSTYLE, WPARAM(WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON), TRUE);
-			PrintLastError(GetLastError());
+			LESL::LastError::PrintLastError(GetLastError());
 			std::cout << delimiter << std::endl;
 			continue;
 		}
 
-		PrintLastError(GetLastError());
+		LESL::LastError::PrintLastError(GetLastError());
 
 		SendMessage(GetDlgItem(hwnd, i), BM_SETIMAGE, IMAGE_BITMAP, (LPARAM)bmpIcon);
 	}

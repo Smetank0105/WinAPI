@@ -15,6 +15,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Calc", "Calc\Calc.vcxproj",
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Buttons", "Buttons\Buttons.vcxproj", "{793CA14D-DAF0-4E2A-B4AE-5E4D563DC9B3}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LastError", "LastError\LastError.vcxproj", "{68402697-6DCF-4D2A-A7E8-B046266817EC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -71,6 +73,14 @@ Global
 		{793CA14D-DAF0-4E2A-B4AE-5E4D563DC9B3}.Release|x64.Build.0 = Release|x64
 		{793CA14D-DAF0-4E2A-B4AE-5E4D563DC9B3}.Release|x86.ActiveCfg = Release|Win32
 		{793CA14D-DAF0-4E2A-B4AE-5E4D563DC9B3}.Release|x86.Build.0 = Release|Win32
+		{68402697-6DCF-4D2A-A7E8-B046266817EC}.Debug|x64.ActiveCfg = Debug|x64
+		{68402697-6DCF-4D2A-A7E8-B046266817EC}.Debug|x64.Build.0 = Debug|x64
+		{68402697-6DCF-4D2A-A7E8-B046266817EC}.Debug|x86.ActiveCfg = Debug|Win32
+		{68402697-6DCF-4D2A-A7E8-B046266817EC}.Debug|x86.Build.0 = Debug|Win32
+		{68402697-6DCF-4D2A-A7E8-B046266817EC}.Release|x64.ActiveCfg = Release|x64
+		{68402697-6DCF-4D2A-A7E8-B046266817EC}.Release|x64.Build.0 = Release|x64
+		{68402697-6DCF-4D2A-A7E8-B046266817EC}.Release|x86.ActiveCfg = Release|Win32
+		{68402697-6DCF-4D2A-A7E8-B046266817EC}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
