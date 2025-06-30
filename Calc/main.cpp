@@ -4,31 +4,11 @@
 #include<iostream>
 #include"resource.h"
 #include"LastErrorStaticLibrary.h"
+#include"Constans.h"
 
 namespace LESL = LastErrorStaticLibrary;
 
-#define delimiter "\n----------------------------------------------------------------------\n"
-CONST CHAR g_sz_CLASS_NAME[] = "MyCalc";
 
-CONST CHAR* g_sz_OPERATIONS[] = { "+","-","*","/" };
-CONST CHAR* g_sz_EDIT[] = { "<-","C","=" };
-CONST CHAR* g_sz_BUTTON_FILENAMES[] = { "point","plus","minus","aster","slash","bsp","clr","equal" };
-
-CONST INT g_i_BUTTON_SIZE = 50;
-CONST INT g_i_INTERVAL = 1;
-CONST INT g_i_BUTTON_SPACE = g_i_BUTTON_SIZE + g_i_INTERVAL;
-CONST INT g_i_BUTTON_SIZE_DOUBLE = g_i_BUTTON_SIZE * 2 + g_i_INTERVAL;
-CONST INT g_i_START_X = 10;
-CONST INT g_i_START_Y = 10;
-CONST INT g_i_DISPLAY_HEIGHT = 48;
-CONST INT g_i_DISPLAY_WIDTH = g_i_BUTTON_SIZE * 5 + g_i_INTERVAL * 4;
-CONST INT g_i_BUTTON_START_X = g_i_START_X;
-CONST INT g_i_BUTTON_START_Y = g_i_START_Y + g_i_DISPLAY_HEIGHT + g_i_INTERVAL;
-
-CONST INT g_i_WINDOW_WIDTH = g_i_DISPLAY_WIDTH + 2 * g_i_BUTTON_START_X + 16;
-CONST INT g_i_WINDOW_HEIGHT = (g_i_DISPLAY_HEIGHT + g_i_INTERVAL) + g_i_BUTTON_SPACE * 4 + g_i_START_Y * 2 + 24 + 16;
-
-CONST INT g_SIZE = 256;
 
 HFONT hFont;
 
@@ -101,6 +81,8 @@ INT WINAPI WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	static INT operation = 0;
 	static BOOL input = FALSE;				//Пользователь ввёл число
 	static BOOL input_operation = FALSE;	//Пользователь ввёл знак операции
+
+	static INT index = 0;
 
 	switch (uMsg)
 	{
@@ -176,8 +158,7 @@ INT WINAPI WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				hwnd, (HMENU)(IDC_BUTTON_BSP + i), GetModuleHandle(NULL), NULL
 			);
 		}
-		//SetSkin(hwnd, "square_blue");
-		SetSkinFormDLL(hwnd, "hand_maid");
+		SetSkinFormDLL(hwnd, "square_blue");
 
 		AddFontResourceEx("Fonts\\digital-7.ttf", FR_PRIVATE, NULL);
 		hFont = CreateFont
@@ -195,6 +176,19 @@ INT WINAPI WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		);
 		SendMessage(hEditDisplay,WM_SETFONT,(WPARAM)hFont,TRUE);
 
+	}
+	break;
+	case WM_CTLCOLOREDIT:
+	{
+		HDC hdcEdit = (HDC)wParam;	//HDC - Handler to Device Context
+		SetBkColor(hdcEdit, g_DISPLAY_BACKGROUND[index]);
+		SetTextColor(hdcEdit, g_DISPLAY_FOREGROUND[index]);
+
+		HBRUSH hbrBackground = CreateSolidBrush(g_WINDOW_BACKGROUND[index]);
+		SetClassLongPtr(hwnd, GCLP_HBRBACKGROUND, (LONG)hbrBackground);
+		SendMessage(hwnd, WM_ERASEBKGND, wParam, 0);
+		RedrawWindow(hwnd, NULL, NULL, RDW_ERASE);
+		return(LRESULT)hbrBackground;
 	}
 	break;
 	case WM_COMMAND:
@@ -257,6 +251,10 @@ INT WINAPI WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			input_operation = FALSE;
 			sprintf(szDisplay, "%g", a);
 			SendMessage(hEditDisplay, WM_SETTEXT, 0, (LPARAM)szDisplay);
+		}
+		if (LOWORD(wParam) == IDC_EDIT_DISPLAY && HIWORD(wParam) == EN_SETFOCUS)
+		{
+			SetFocus(hwnd);
 		}
 	}
 	break;
@@ -371,16 +369,29 @@ INT WINAPI WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		InsertMenu(hMainMenu, 0, MF_BYPOSITION | MF_SEPARATOR, 0, 0);
 		InsertMenu(hMainMenu, 0, MF_BYPOSITION | MF_STRING, CM_SQUARE_BLUE,"Square Blue");
 		InsertMenu(hMainMenu, 0, MF_BYPOSITION | MF_STRING, CM_METAL_MISTRAL,"Metal Mistral");
-		InsertMenu(hMainMenu, 0, MF_BYPOSITION | MF_STRING, CM_HAND_MAID,"Hand Maid");
 
 		BOOL item = TrackPopupMenuEx(hMainMenu, TPM_RETURNCMD | TPM_RIGHTALIGN | TPM_BOTTOMALIGN, LOWORD(lParam), HIWORD(lParam), hwnd, NULL);
-
 		switch (item)
 		{
-		case CM_SQUARE_BLUE: SetSkinFormDLL(hwnd, "square_blue"); break;
-		case CM_METAL_MISTRAL: SetSkinFormDLL(hwnd, "metal_mistral"); break;
-		case CM_HAND_MAID: SetSkinFormDLL(hwnd, "hand_maid"); break;
+		case CM_EXIT: SendMessage(hwnd, WM_DESTROY,0,0); break;
+		//case CM_SQUARE_BLUE: SetSkinFormDLL(hwnd, "square_blue"); break;
+		//case CM_METAL_MISTRAL: SetSkinFormDLL(hwnd, "metal_mistral"); break;
 		}
+		DestroyMenu(hMainMenu);
+
+		if (item>=CM_SQUARE_BLUE && item <= CM_METAL_MISTRAL)
+		{
+			index = item - CM_SQUARE_BLUE;
+			SetSkinFormDLL(hwnd, g_sz_SKIN[index]);
+
+		HWND hEditDisplay = GetDlgItem(hwnd, IDC_EDIT_DISPLAY);
+		HDC hdcEditDisplay = GetDC(hEditDisplay);
+		SendMessage(hwnd, WM_CTLCOLOREDIT, (WPARAM)hdcEditDisplay, 0);
+		ReleaseDC(hEditDisplay, hdcEditDisplay);		//Контекст устройства обязательно нужно освобождать
+
+		SetFocus(hEditDisplay);
+		}
+
 	}
 	break;
 

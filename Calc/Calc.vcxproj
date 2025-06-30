@@ -150,6 +150,7 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Constans.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
