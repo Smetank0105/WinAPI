@@ -364,7 +364,26 @@ INT WINAPI WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	}
 	break;
 
+	case WM_CONTEXTMENU:
+	{
+		HMENU hMainMenu = CreatePopupMenu();
+		InsertMenu(hMainMenu, 0, MF_BYPOSITION | MF_STRING, CM_EXIT, "Exit");
+		InsertMenu(hMainMenu, 0, MF_BYPOSITION | MF_SEPARATOR, 0, 0);
+		InsertMenu(hMainMenu, 0, MF_BYPOSITION | MF_STRING, CM_SQUARE_BLUE,"Square Blue");
+		InsertMenu(hMainMenu, 0, MF_BYPOSITION | MF_STRING, CM_METAL_MISTRAL,"Metal Mistral");
+		InsertMenu(hMainMenu, 0, MF_BYPOSITION | MF_STRING, CM_HAND_MAID,"Hand Maid");
+
+		BOOL item = TrackPopupMenuEx(hMainMenu, TPM_RETURNCMD | TPM_RIGHTALIGN | TPM_BOTTOMALIGN, LOWORD(lParam), HIWORD(lParam), hwnd, NULL);
+
+		switch (item)
+		{
+		case CM_SQUARE_BLUE: SetSkinFormDLL(hwnd, "square_blue"); break;
+		case CM_METAL_MISTRAL: SetSkinFormDLL(hwnd, "metal_mistral"); break;
+		case CM_HAND_MAID: SetSkinFormDLL(hwnd, "hand_maid"); break;
+		}
+	}
 	break;
+
 	case WM_DESTROY:
 		DeleteObject(hFont);
 		RemoveFontResourceEx("Fonts\\digital-7.ttf", FR_PRIVATE, NULL);
