@@ -8,13 +8,12 @@
 
 namespace LESL = LastErrorStaticLibrary;
 
-
-
-HFONT hFont;
-
 INT WINAPI WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 VOID SetSkin(HWND hwnd, CONST CHAR sz_skin[]);
 VOID SetSkinFormDLL(HWND hwnd, CONST CHAR sz_skin[]);
+VOID LoadFontFromDLL(HMODULE hFontModule, INT resourceID);
+VOID LoadFontsFromDLL(HMODULE hFontModule);
+VOID SetFont(HWND hwnd, CONST CHAR font_name[]);
 
 INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, INT nCmdShow)
 {
@@ -83,6 +82,7 @@ INT WINAPI WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	static BOOL input_operation = FALSE;	//Пользователь ввёл знак операции
 
 	static INT index = 0;
+	static INT font_index = 0;
 
 	switch (uMsg)
 	{
@@ -160,7 +160,7 @@ INT WINAPI WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		}
 		SetSkinFormDLL(hwnd, "square_blue");
 
-		AddFontResourceEx("Fonts\\digital-7.ttf", FR_PRIVATE, NULL);
+		/*AddFontResourceEx("Fonts\\digital-7.ttf", FR_PRIVATE, NULL);
 		hFont = CreateFont
 		(
 			g_i_DISPLAY_HEIGHT-2, g_i_DISPLAY_HEIGHT/3,
@@ -174,7 +174,11 @@ INT WINAPI WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			FF_DONTCARE,
 			"Digital-7"
 		);
-		SendMessage(hEditDisplay,WM_SETFONT,(WPARAM)hFont,TRUE);
+		SendMessage(hEditDisplay, WM_SETFONT, (WPARAM)hFont, TRUE);*/
+
+		HMODULE hFonts = LoadLibrary("FontsOnlyDLL.DLL");
+		LoadFontsFromDLL(hFonts);
+		SetFont(hwnd, g_sz_FONT[font_index]);
 
 	}
 	break;
@@ -367,37 +371,36 @@ INT WINAPI WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		HMENU hMainMenu = CreatePopupMenu();
 		InsertMenu(hMainMenu, 0, MF_BYPOSITION | MF_STRING, CM_EXIT, "Exit");
 		InsertMenu(hMainMenu, 0, MF_BYPOSITION | MF_SEPARATOR, 0, 0);
-		InsertMenu(hMainMenu, 0, MF_BYPOSITION | MF_STRING, CM_SQUARE_BLUE,"Square Blue");
-		InsertMenu(hMainMenu, 0, MF_BYPOSITION | MF_STRING, CM_METAL_MISTRAL,"Metal Mistral");
+		InsertMenu(hMainMenu, 0, MF_BYPOSITION | MF_STRING, CM_SQUARE_BLUE, "Square Blue");
+		InsertMenu(hMainMenu, 0, MF_BYPOSITION | MF_STRING, CM_METAL_MISTRAL, "Metal Mistral");
 
 		BOOL item = TrackPopupMenuEx(hMainMenu, TPM_RETURNCMD | TPM_RIGHTALIGN | TPM_BOTTOMALIGN, LOWORD(lParam), HIWORD(lParam), hwnd, NULL);
+		//TPM_RETURNCMD - возвращает ID-ресурса выбранного элемента
 		switch (item)
 		{
-		case CM_EXIT: SendMessage(hwnd, WM_DESTROY,0,0); break;
-		//case CM_SQUARE_BLUE: SetSkinFormDLL(hwnd, "square_blue"); break;
-		//case CM_METAL_MISTRAL: SetSkinFormDLL(hwnd, "metal_mistral"); break;
+		case CM_EXIT: SendMessage(hwnd, WM_DESTROY, 0, 0); break;
+			//case CM_SQUARE_BLUE: SetSkinFormDLL(hwnd, "square_blue"); break;
+			//case CM_METAL_MISTRAL: SetSkinFormDLL(hwnd, "metal_mistral"); break;
 		}
 		DestroyMenu(hMainMenu);
 
-		if (item>=CM_SQUARE_BLUE && item <= CM_METAL_MISTRAL)
+		if (item >= CM_SQUARE_BLUE && item <= CM_METAL_MISTRAL)
 		{
 			index = item - CM_SQUARE_BLUE;
 			SetSkinFormDLL(hwnd, g_sz_SKIN[index]);
 
-		HWND hEditDisplay = GetDlgItem(hwnd, IDC_EDIT_DISPLAY);
-		HDC hdcEditDisplay = GetDC(hEditDisplay);
-		SendMessage(hwnd, WM_CTLCOLOREDIT, (WPARAM)hdcEditDisplay, 0);
-		ReleaseDC(hEditDisplay, hdcEditDisplay);		//Контекст устройства обязательно нужно освобождать
+			HWND hEditDisplay = GetDlgItem(hwnd, IDC_EDIT_DISPLAY);
+			HDC hdcEditDisplay = GetDC(hEditDisplay);
+			SendMessage(hwnd, WM_CTLCOLOREDIT, (WPARAM)hdcEditDisplay, 0);
+			ReleaseDC(hEditDisplay, hdcEditDisplay);		//Контекст устройства обязательно нужно освобождать
 
-		SetFocus(hEditDisplay);
+			SetFocus(hEditDisplay);
 		}
 
 	}
 	break;
 
 	case WM_DESTROY:
-		DeleteObject(hFont);
-		RemoveFontResourceEx("Fonts\\digital-7.ttf", FR_PRIVATE, NULL);
 		FreeConsole();
 		PostQuitMessage(0);
 		break;
@@ -409,28 +412,6 @@ INT WINAPI WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	}
 	return FALSE;
 }
-
-//LPSTR FormatLastError(DWORD dwErrorID)
-//{
-//	LPSTR lpszMessage = NULL;
-//	FormatMessage
-//	(
-//		FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-//		NULL,
-//		dwErrorID,
-//		MAKELANGID(LANG_NEUTRAL, SUBLANG_RUSSIAN_RUSSIA),
-//		(LPSTR)&lpszMessage,
-//		NULL,
-//		NULL
-//	);
-//	return lpszMessage;
-//}
-//VOID PrintLastError(DWORD dwErrorID)
-//{
-//	LPSTR lpszMessage = FormatLastError(GetLastError());
-//	std::cout << lpszMessage << std::endl;
-//	LocalFree(lpszMessage);
-//}
 
 VOID SetSkin(HWND hwnd, CONST CHAR sz_skin[])
 {
@@ -477,11 +458,49 @@ VOID SetSkinFormDLL(HWND hwnd, CONST CHAR sz_skin[])
 			hButtonsModule,
 			MAKEINTRESOURCE(i),
 			IMAGE_BITMAP,
-			i == IDC_BUTTON_0		? g_i_BUTTON_SIZE_DOUBLE : g_i_BUTTON_SIZE,
-			i == IDC_BUTTON_EQUAL	? g_i_BUTTON_SIZE_DOUBLE : g_i_BUTTON_SIZE,
+			i == IDC_BUTTON_0 ? g_i_BUTTON_SIZE_DOUBLE : g_i_BUTTON_SIZE,
+			i == IDC_BUTTON_EQUAL ? g_i_BUTTON_SIZE_DOUBLE : g_i_BUTTON_SIZE,
 			LR_SHARED
 		);
 		SendMessage(GetDlgItem(hwnd, i), BM_SETIMAGE, IMAGE_BITMAP, (LPARAM)bmpButton);
 	}
 	FreeLibrary(hButtonsModule);
+}
+
+VOID LoadFontFromDLL(HMODULE hFontModule, INT resourceID)
+{
+	HRSRC hFntRes = FindResource(hFontModule, MAKEINTRESOURCE(resourceID), MAKEINTRESOURCE(RT_FONT));
+	HGLOBAL hFntMem = LoadResource(hFontModule, hFntRes);
+	VOID* fntData = LockResource(hFntMem);
+	DWORD nFonts = 0;
+	DWORD len = SizeofResource(hFontModule, hFntRes);
+	AddFontMemResourceEx(fntData, len, NULL, &nFonts);
+}
+
+VOID LoadFontsFromDLL(HMODULE hFontModule)
+{
+	for (int i = 301; i <= 304; i++)
+	{
+		LoadFontFromDLL(hFontModule, i);
+	}
+}
+
+VOID SetFont(HWND hwnd, CONST CHAR font_name[])
+{
+	HWND hEditDisplay = GetDlgItem(hwnd, IDC_EDIT_DISPLAY);
+	//AddFontResourceEx("Fonts\\digital-7.ttf", FR_PRIVATE, NULL);
+	HFONT hFont = CreateFont
+	(
+		g_i_DISPLAY_HEIGHT - 2, g_i_DISPLAY_HEIGHT / 3,
+		0, 0,
+		FW_BOLD,
+		FALSE, FALSE, FALSE,
+		DEFAULT_CHARSET,
+		OUT_TT_PRECIS,
+		CLIP_DEFAULT_PRECIS,
+		ANTIALIASED_QUALITY,
+		FF_DONTCARE,
+		font_name
+	);
+	SendMessage(hEditDisplay, WM_SETFONT, (WPARAM)hFont, TRUE);
 }
