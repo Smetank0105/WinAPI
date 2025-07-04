@@ -376,13 +376,13 @@ INT WINAPI WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		InsertMenu(hMainMenu, 0, MF_BYPOSITION | MF_STRING, CM_EXIT, "Exit");
 		InsertMenu(hMainMenu, 0, MF_BYPOSITION | MF_SEPARATOR, 0, 0);
 		InsertMenu(hMainMenu, 0, MF_BYPOSITION | MF_STRING | MF_POPUP, (UINT_PTR)hSkinMenu, "Skin");
-		InsertMenu(hSkinMenu, 1, MF_BYPOSITION | MF_STRING, CM_SQUARE_BLUE, "Square Blue");
-		InsertMenu(hSkinMenu, 1, MF_BYPOSITION | MF_STRING, CM_METAL_MISTRAL, "Metal Mistral");
+		InsertMenu(hSkinMenu, 0, MF_BYPOSITION | MF_STRING, CM_SQUARE_BLUE, "Square Blue");
+		InsertMenu(hSkinMenu, 0, MF_BYPOSITION | MF_STRING, CM_METAL_MISTRAL, "Metal Mistral");
 		InsertMenu(hMainMenu, 0, MF_BYPOSITION | MF_STRING | MF_POPUP, (UINT_PTR)hFontMenu, "Fonts");
-		InsertMenu(hFontMenu, 1, MF_BYPOSITION | MF_STRING, CM_DIGITAL, "Digital-7");
-		InsertMenu(hFontMenu, 1, MF_BYPOSITION | MF_STRING, CM_TRISTAN, "Tristan DEMO");
-		InsertMenu(hFontMenu, 1, MF_BYPOSITION | MF_STRING, CM_ASTR, "Astronaut III");
-		InsertMenu(hFontMenu, 1, MF_BYPOSITION | MF_STRING, CM_TERMINATOR, "Terminator Two");
+		InsertMenu(hFontMenu, 0, MF_BYPOSITION | MF_STRING, CM_DIGITAL, "Digital-7");
+		InsertMenu(hFontMenu, 0, MF_BYPOSITION | MF_STRING, CM_TRISTAN, "Tristan DEMO");
+		InsertMenu(hFontMenu, 0, MF_BYPOSITION | MF_STRING, CM_ASTR, "Astronaut III");
+		InsertMenu(hFontMenu, 0, MF_BYPOSITION | MF_STRING, CM_TERMINATOR, "Terminator Two");
 
 		BOOL item = TrackPopupMenuEx(hMainMenu, TPM_RETURNCMD | TPM_RIGHTALIGN | TPM_BOTTOMALIGN, LOWORD(lParam), HIWORD(lParam), hwnd, NULL);
 		//TPM_RETURNCMD - возвращает ID-ресурса выбранного элемента
