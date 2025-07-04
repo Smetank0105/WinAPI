@@ -384,6 +384,9 @@ INT WINAPI WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		InsertMenu(hFontMenu, 0, MF_BYPOSITION | MF_STRING, CM_ASTR, "Astronaut III");
 		InsertMenu(hFontMenu, 0, MF_BYPOSITION | MF_STRING, CM_TERMINATOR, "Terminator Two");
 
+		CheckMenuItem(hFontMenu, font_index + CM_DIGITAL, MF_BYCOMMAND | MF_CHECKED);
+		CheckMenuItem(hSkinMenu, index + CM_SQUARE_BLUE, MF_BYCOMMAND | MF_CHECKED);
+
 		BOOL item = TrackPopupMenuEx(hMainMenu, TPM_RETURNCMD | TPM_RIGHTALIGN | TPM_BOTTOMALIGN, LOWORD(lParam), HIWORD(lParam), hwnd, NULL);
 		//TPM_RETURNCMD - возвращает ID-ресурса выбранного элемента
 		switch (item)
