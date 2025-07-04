@@ -409,8 +409,6 @@ INT WINAPI WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		if (item >= CM_DIGITAL && item <= CM_TERMINATOR)
 		{
 			font_index = item - CM_DIGITAL;
-			HMODULE hFonts = LoadLibrary("FontsOnlyDLL.dll");
-			LoadFontsFromDLL(hFonts);
 			SetFont(hwnd, g_sz_FONT[font_index]);
 
 			SetSkinFormDLL(hwnd, g_sz_SKIN[index]);
