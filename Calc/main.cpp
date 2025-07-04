@@ -15,6 +15,7 @@ VOID LoadFontFromDLL(HMODULE hFontModule, INT resourceID);
 VOID LoadFontsFromDLL(HMODULE hFontModule);
 VOID SetFont(HWND hwnd, CONST CHAR font_name[]);
 
+
 INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, INT nCmdShow)
 {
 	//1) –егистраци€ класса:
@@ -160,6 +161,10 @@ INT WINAPI WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		}
 		SetSkinFormDLL(hwnd, "square_blue");
 
+		HMODULE hFonts = LoadLibrary("FontsOnlyDLL.dll");
+		LoadFontsFromDLL(hFonts);
+		SetFont(hwnd, g_sz_FONT[font_index]);
+
 		/*AddFontResourceEx("Fonts\\digital-7.ttf", FR_PRIVATE, NULL);
 		hFont = CreateFont
 		(
@@ -176,9 +181,6 @@ INT WINAPI WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		);
 		SendMessage(hEditDisplay, WM_SETFONT, (WPARAM)hFont, TRUE);*/
 
-		HMODULE hFonts = LoadLibrary("FontsOnlyDLL.DLL");
-		LoadFontsFromDLL(hFonts);
-		SetFont(hwnd, g_sz_FONT[font_index]);
 
 	}
 	break;
@@ -369,10 +371,18 @@ INT WINAPI WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	case WM_CONTEXTMENU:
 	{
 		HMENU hMainMenu = CreatePopupMenu();
+		HMENU hFontMenu = CreatePopupMenu();
+		HMENU hSkinMenu = CreatePopupMenu();
 		InsertMenu(hMainMenu, 0, MF_BYPOSITION | MF_STRING, CM_EXIT, "Exit");
 		InsertMenu(hMainMenu, 0, MF_BYPOSITION | MF_SEPARATOR, 0, 0);
-		InsertMenu(hMainMenu, 0, MF_BYPOSITION | MF_STRING, CM_SQUARE_BLUE, "Square Blue");
-		InsertMenu(hMainMenu, 0, MF_BYPOSITION | MF_STRING, CM_METAL_MISTRAL, "Metal Mistral");
+		InsertMenu(hMainMenu, 0, MF_BYPOSITION | MF_STRING | MF_POPUP, (UINT_PTR)hSkinMenu, "Skin");
+		InsertMenu(hSkinMenu, 1, MF_BYPOSITION | MF_STRING, CM_SQUARE_BLUE, "Square Blue");
+		InsertMenu(hSkinMenu, 1, MF_BYPOSITION | MF_STRING, CM_METAL_MISTRAL, "Metal Mistral");
+		InsertMenu(hMainMenu, 0, MF_BYPOSITION | MF_STRING | MF_POPUP, (UINT_PTR)hFontMenu, "Fonts");
+		InsertMenu(hFontMenu, 1, MF_BYPOSITION | MF_STRING, CM_DIGITAL, "Digital-7");
+		InsertMenu(hFontMenu, 1, MF_BYPOSITION | MF_STRING, CM_TRISTAN, "Tristan DEMO");
+		InsertMenu(hFontMenu, 1, MF_BYPOSITION | MF_STRING, CM_ASTR, "Astronaut III");
+		InsertMenu(hFontMenu, 1, MF_BYPOSITION | MF_STRING, CM_TERMINATOR, "Terminator Two");
 
 		BOOL item = TrackPopupMenuEx(hMainMenu, TPM_RETURNCMD | TPM_RIGHTALIGN | TPM_BOTTOMALIGN, LOWORD(lParam), HIWORD(lParam), hwnd, NULL);
 		//TPM_RETURNCMD - возвращает ID-ресурса выбранного элемента
@@ -395,6 +405,15 @@ INT WINAPI WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			ReleaseDC(hEditDisplay, hdcEditDisplay);		// онтекст устройства об€зательно нужно освобождать
 
 			SetFocus(hEditDisplay);
+		}
+		if (item >= CM_DIGITAL && item <= CM_TERMINATOR)
+		{
+			font_index = item - CM_DIGITAL;
+			HMODULE hFonts = LoadLibrary("FontsOnlyDLL.dll");
+			LoadFontsFromDLL(hFonts);
+			SetFont(hwnd, g_sz_FONT[font_index]);
+
+			SetSkinFormDLL(hwnd, g_sz_SKIN[index]);
 		}
 
 	}

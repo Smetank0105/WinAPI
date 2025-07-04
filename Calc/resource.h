@@ -26,6 +26,10 @@
 #define CM_SQUARE_BLUE					201
 #define CM_METAL_MISTRAL				202
 #define CM_HAND_MAID					203
+#define CM_DIGITAL						204
+#define CM_TRISTAN						205
+#define CM_ASTR							206
+#define CM_TERMINATOR					207
 	
 #define IDC_EDIT_DISPLAY                999
 #define IDC_BUTTON_0                    1000
