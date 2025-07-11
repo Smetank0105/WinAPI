@@ -1,18 +1,24 @@
 #include<Windows.h>
-#include<Richedit.h>
 #include"resource.h"
 
-CHAR CONST g_sz_CLASS_NAME[] = "MyNotepad";
+CONST CHAR g_sz_CLASS_NAME[] = "MyNotepad";
+
+CONST CHAR* g_sz_MENU_NAME[] = { "FILE","EDIT","STYLE" };
+CONST CHAR* g_sz_BUTTON_FILE_NAME[] = { "OPEN FILE", "SAVE FILE", "SAVE AS ...", "EXIT" };
+CONST CHAR* g_sz_BUTTON_EDIT_NAME[] = { "UNDO", "CUT", "COPY", "PASTE", "DELETE" };
+CONST CHAR* g_sz_BUTTON_STYLE_NAME[] = { "BOLD", "ITALIC", "UNDERLINE" };
+CONST INT g_i_BUTTONS_COUNT[] = { 4, 5, 3 };
+CONST CHAR** g_sz_BUTTONS_NAME[] = { g_sz_BUTTON_FILE_NAME, g_sz_BUTTON_EDIT_NAME, g_sz_BUTTON_STYLE_NAME };
+
+CONST INT g_i_PANEL_VSIZE = 30;
+CONST INT g_i_BUTTON_HSIZE = 66;
+CONST INT g_i_BUTTON_VSIZE = 22;
+CONST INT g_i_INTERVAL = 4;
 
 INT WINAPI WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-HINSTANCE hRichEditLib;
-
 INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, INT nCmdShow)
 {
-	hRichEditLib = LoadLibrary("riched20.dll");
-	if (!hRichEditLib) return FALSE;
-
 	WNDCLASSEX wClass;
 	ZeroMemory(&wClass, sizeof(wClass));
 
@@ -71,29 +77,62 @@ INT WINAPI WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
 	case WM_CREATE:
 	{
+		for (INT i = 0; i < 3; i++)
+		{
+			CreateWindowEx
+			(
+				NULL, "Button", g_sz_MENU_NAME[i],
+				WS_CHILD | BS_PUSHBUTTON | WS_VISIBLE,
+				g_i_INTERVAL + (g_i_INTERVAL + g_i_BUTTON_HSIZE) * i, g_i_INTERVAL, g_i_BUTTON_HSIZE, g_i_BUTTON_VSIZE,
+				hwnd, (HMENU)(IDC_BUTTON_FILE + i), GetModuleHandle(NULL), NULL
+			);
+		}
+
 		RECT rect;
 		GetClientRect(hwnd, &rect);
-
 		HWND hRichEdit = CreateWindowEx
 		(
-			NULL, RICHEDIT_CLASS, "",
+			NULL, "Edit", "",
 			WS_CHILD | WS_VISIBLE | WS_BORDER | WS_HSCROLL | WS_VSCROLL |
-			ES_NOHIDESEL | ES_AUTOVSCROLL | ES_MULTILINE |
-			ES_SAVESEL | ES_SUNKEN,
-			0, 0, rect.right - rect.left, rect.bottom - rect.top,
-			hwnd, (HMENU)IDC_RICHEDIT, GetModuleHandle(NULL), NULL
+			ES_NOHIDESEL | ES_AUTOVSCROLL | ES_AUTOHSCROLL | ES_MULTILINE,
+			0, g_i_PANEL_VSIZE, rect.right - rect.left, rect.bottom - rect.top - g_i_PANEL_VSIZE,
+			hwnd, (HMENU)IDC_EDIT, GetModuleHandle(NULL), NULL
 		);
-
 		if (hRichEdit == NULL) return FALSE;
-
 		SetFocus(hRichEdit);
 	}
-		break;
+	break;
 	case WM_COMMAND:
-		break;
+	{
+		if (LOWORD(wParam) >= IDC_BUTTON_FILE && LOWORD(wParam) <= IDC_BUTTON_STYLE)
+		{
+			SendMessage(GetDlgItem(hwnd, LOWORD(wParam)), BM_SETSTATE, TRUE, 0);
+
+			HMENU hFileMenu = CreatePopupMenu();
+			INT index = LOWORD(wParam) - IDC_BUTTON_FILE;
+
+			for (INT i = 0; i < g_i_BUTTONS_COUNT[index]; i++)
+			{
+				AppendMenu(hFileMenu, MF_BYPOSITION | MF_STRING, (BM_FILE_OPEN + i + index * 10), g_sz_BUTTONS_NAME[index][i]);
+			}
+
+			RECT rect;
+			GetWindowRect(GetDlgItem(hwnd,LOWORD(wParam)), &rect);
+			BOOL item = TrackPopupMenuEx(hFileMenu, TPM_LEFTALIGN | TPM_TOPALIGN | TPM_RETURNCMD, rect.left, rect.bottom, hwnd, NULL);
+			if (item == BM_FILE_EXIT) SendMessage(hwnd, WM_DESTROY, 0, 0);
+
+			DestroyMenu(hFileMenu);
+			SendMessage(GetDlgItem(hwnd, LOWORD(wParam)), BM_SETSTATE, FALSE, 0);
+		}
+	}
+	break;
+	case WM_SIZE:
+	{
+		MoveWindow(GetDlgItem(hwnd,IDC_EDIT), 0, g_i_PANEL_VSIZE, LOWORD(lParam), HIWORD(lParam) - g_i_PANEL_VSIZE, TRUE);
+	}
+	break;
 	case WM_DESTROY:
 		FreeConsole();
-		if(hRichEditLib) FreeLibrary(hRichEditLib);
 		PostQuitMessage(0);
 		break;
 	case WM_CLOSE:
