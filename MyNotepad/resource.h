@@ -4,10 +4,11 @@
 //
 #define IDI_ICON                        101
 
-#define BM_FILE_OPEN					200
-#define BM_FILE_SAVE					201
-#define BM_FILE_SAVEAS					202
-#define BM_FILE_EXIT					203
+#define BM_FILE_NEW						200
+#define BM_FILE_OPEN					201
+#define BM_FILE_SAVE					202
+#define BM_FILE_SAVEAS					203
+#define BM_FILE_EXIT					204
 #define BM_EDIT_UNDO					210
 #define BM_EDIT_CUT						211
 #define BM_EDIT_COPY					212
@@ -17,7 +18,7 @@
 #define BM_STYLE_ITALIC					221
 #define BM_STYLE_UNDERLINE				222
 
-#define IDC_EDIT						999
+#define IDC_RICHEDIT					999
 #define IDC_BUTTON_FILE					1000
 #define IDC_BUTTON_EDIT					1001
 #define IDC_BUTTON_STYLE				1002
