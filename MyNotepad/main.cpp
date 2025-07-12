@@ -16,12 +16,14 @@ CONST INT g_i_BUTTON_HSIZE = 66;
 CONST INT g_i_BUTTON_VSIZE = 22;
 CONST INT g_i_INTERVAL = 4;
 
+CHAR sz_filepath[MAX_PATH] = {};
+
 INT WINAPI WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK DlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-VOID Open_File(HWND hwnd);
-VOID Save_File(HWND hwnd);
-VOID SaveAs_File(HWND hwnd);
+VOID Open_File(HWND hwnd, CONST CHAR* path);
+VOID Save_File(HWND hwnd, CONST CHAR* path);
+VOID SaveAs_File(HWND hwnd, CONST CHAR* path);
 
 HINSTANCE hLib;
 
@@ -122,8 +124,9 @@ INT WINAPI WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			BOOL item = TrackPopupMenuEx(hFileMenu, TPM_LEFTALIGN | TPM_TOPALIGN | TPM_RETURNCMD, rect.left, rect.bottom, hwnd, NULL);
 
 			if (item == BM_FILE_NEW) SendMessage(GetDlgItem(hwnd, IDC_RICHEDIT), WM_SETTEXT, 0, (LPARAM)"\0");
-			if (item == BM_FILE_OPEN) Open_File(hwnd);
-			if (item == BM_FILE_SAVE) Save_File(hwnd);
+			if (item == BM_FILE_OPEN) Open_File(hwnd, sz_filepath);
+			if (item == BM_FILE_SAVE) Save_File(hwnd, sz_filepath);
+			if (item == BM_FILE_SAVEAS) SaveAs_File(hwnd, sz_filepath);
 			if (item == BM_FILE_EXIT) SendMessage(hwnd, WM_DESTROY, 0, 0);
 			if (item >= BM_STYLE_BOLD && item <= BM_STYLE_UNDERLINE)
 			{
@@ -145,6 +148,7 @@ INT WINAPI WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 			DestroyMenu(hFileMenu);
 			SendMessage(GetDlgItem(hwnd, LOWORD(wParam)), BM_SETSTATE, FALSE, 0);
+			SetFocus(GetDlgItem(hwnd, IDC_RICHEDIT));
 		}
 	}
 	break;
@@ -173,36 +177,76 @@ BOOL CALLBACK DlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	switch (uMsg)
 	{
 	case WM_INITDIALOG:
+		SetFocus(GetDlgItem(hwnd, IDC_EDIT1));
 		break;
 	case WM_COMMAND:
-		break;
+	{
+		switch (LOWORD(wParam))
+		{
+		case IDOK:
+			SendMessage(GetDlgItem(hwnd, IDC_EDIT1), WM_GETTEXT, MAX_PATH, (LPARAM)sz_filepath);
+		case IDCANCEL:
+			EndDialog(hwnd, 0);
+			break;
+		}
+	}
+	break;
 	case WM_CLOSE:
 		EndDialog(hwnd, 0);
 	}
 	return FALSE;
 }
 
-VOID Open_File(HWND hwnd)
+VOID Open_File(HWND hwnd, CONST CHAR* path)
 {
-	HANDLE file = CreateFile("Test.txt", GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	SendMessage(GetDlgItem(hwnd, IDC_BUTTON_FILE), BM_SETSTATE, FALSE, 0);
+	DialogBoxParam(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_DIALOG1), hwnd, DlgProc, 0);
+	HANDLE file = CreateFile(path, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	if (file == INVALID_HANDLE_VALUE)
+	{
+		MessageBox(hwnd, "File not found", "", MB_OK | MB_ICONERROR);
+		return;
+	}
 	DWORD dwRead;
 	DWORD size;
 	size = GetFileSize(file, NULL);
 	LPSTR sz_buffer = (LPSTR)malloc(size);
 	ReadFile(file, sz_buffer, size, &dwRead, NULL);
 	SendMessage(GetDlgItem(hwnd, IDC_RICHEDIT), WM_SETTEXT, 0, (LPARAM)sz_buffer);
+	sz_buffer = {};
 	free(sz_buffer);
 	CloseHandle(file);
 }
 
-VOID Save_File(HWND hwnd)
+VOID Save_File(HWND hwnd, CONST CHAR* path)
 {
-	HANDLE file = CreateFile("Test.txt", GENERIC_WRITE, FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	HANDLE file = CreateFile(path, GENERIC_WRITE, FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	if (file == INVALID_HANDLE_VALUE)
+	{
+		SaveAs_File(hwnd, sz_filepath);
+		return;
+	}
 	DWORD dwWrite;
 	DWORD size = 1 + GetWindowTextLength(GetDlgItem(hwnd, IDC_RICHEDIT));
 	LPSTR sz_buffer = (LPSTR)malloc(size);
 	SendMessage(GetDlgItem(hwnd, IDC_RICHEDIT), WM_GETTEXT, size, (LPARAM)sz_buffer);
 	WriteFile(file, sz_buffer, size, &dwWrite, NULL);
+	sz_buffer = {};
+	free(sz_buffer);
+	CloseHandle(file);
+}
+
+VOID SaveAs_File(HWND hwnd, CONST CHAR* path)
+{
+	SendMessage(GetDlgItem(hwnd, IDC_BUTTON_FILE), BM_SETSTATE, FALSE, 0);
+	DialogBoxParam(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_DIALOG1), hwnd, DlgProc, 0);
+	HANDLE file = CreateFile(path, GENERIC_WRITE, FILE_SHARE_WRITE, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	DWORD dwWrite;
+	DWORD size = 1 + GetWindowTextLength(GetDlgItem(hwnd, IDC_RICHEDIT));
+	LPSTR sz_buffer = (LPSTR)malloc(size);
+	SendMessage(GetDlgItem(hwnd, IDC_RICHEDIT), WM_GETTEXT, size, (LPARAM)sz_buffer);
+	WriteFile(file, sz_buffer, size, &dwWrite, NULL);
+	sz_buffer = {};
 	free(sz_buffer);
 	CloseHandle(file);
 }
