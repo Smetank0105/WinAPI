@@ -3,9 +3,7 @@
 // Used by Resource.rc
 //
 #define IDI_ICON                        101
-
 #define IDD_DIALOG1                     102
-#define IDD_DIALOG2                     103
 
 #define BM_FILE_NEW                     200
 #define BM_FILE_OPEN                    201
@@ -27,7 +25,6 @@
 #define IDC_BUTTON_STYLE                1002
 
 #define IDC_EDIT1                       1100
-#define IDC_EDIT2                       1101
 
 // Next default values for new objects
 // 
