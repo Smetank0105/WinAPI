@@ -6,9 +6,9 @@ CONST CHAR g_sz_CLASS_NAME[] = "MyNotepad";
 
 CONST CHAR* g_sz_MENU_NAME[] = { "FILE","EDIT","STYLE" };
 CONST CHAR* g_sz_BUTTON_FILE_NAME[] = { "NEW", "OPEN FILE", "SAVE FILE", "SAVE AS ...", "EXIT" };
-CONST CHAR* g_sz_BUTTON_EDIT_NAME[] = { "UNDO", "CUT", "COPY", "PASTE", "DELETE" };
+CONST CHAR* g_sz_BUTTON_EDIT_NAME[] = { "UNDO", "SELECT ALL", "CUT", "COPY", "PASTE", "DELETE" };
 CONST CHAR* g_sz_BUTTON_STYLE_NAME[] = { "BOLD", "ITALIC", "UNDERLINE" };
-CONST INT g_i_BUTTONS_COUNT[] = { 5, 5, 3 };
+CONST INT g_i_BUTTONS_COUNT[] = { 5, 6, 3 };
 CONST CHAR** g_sz_BUTTONS_NAME[] = { g_sz_BUTTON_FILE_NAME, g_sz_BUTTON_EDIT_NAME, g_sz_BUTTON_STYLE_NAME };
 
 CONST INT g_i_PANEL_VSIZE = 30;
@@ -141,6 +141,13 @@ INT WINAPI WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				SendMessage(GetDlgItem(hwnd, IDC_RICHEDIT), EM_SETCHARFORMAT, SCF_SELECTION, (LPARAM)&cf);
 			}
 			if (item == BM_EDIT_UNDO) SendMessage(GetDlgItem(hwnd, IDC_RICHEDIT), EM_UNDO, 0, 0);
+			if (item == BM_EDIT_SELECTALL)
+			{
+				CHARRANGE charR;
+				charR.cpMin = 0;
+				charR.cpMax = -1;
+				SendMessage(GetDlgItem(hwnd, IDC_RICHEDIT), EM_EXSETSEL, 0, (LPARAM)&charR);
+			}
 			if (item == BM_EDIT_CUT) SendMessage(GetDlgItem(hwnd, IDC_RICHEDIT), WM_CUT, 0, 0);
 			if (item == BM_EDIT_COPY) SendMessage(GetDlgItem(hwnd, IDC_RICHEDIT), WM_COPY, 0, 0);
 			if (item == BM_EDIT_PASTE) SendMessage(GetDlgItem(hwnd, IDC_RICHEDIT), WM_PASTE, 0, 0);
@@ -150,6 +157,31 @@ INT WINAPI WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			SendMessage(GetDlgItem(hwnd, LOWORD(wParam)), BM_SETSTATE, FALSE, 0);
 			SetFocus(GetDlgItem(hwnd, IDC_RICHEDIT));
 		}
+	}
+	break;
+	case WM_CONTEXTMENU:
+	{
+		HMENU hCMenu = CreatePopupMenu();
+		for (INT i = BM_EDIT_UNDO; i <= BM_EDIT_DELETE; i++)
+		{
+			AppendMenu(hCMenu, MF_BYPOSITION | MF_STRING, i, g_sz_BUTTON_EDIT_NAME[i - BM_EDIT_UNDO]);
+		}
+
+		BOOL item = TrackPopupMenuEx(hCMenu, TPM_RETURNCMD | TPM_RIGHTALIGN | TPM_BOTTOMALIGN, LOWORD(lParam), HIWORD(lParam), hwnd, NULL);
+		if (item == BM_EDIT_UNDO) SendMessage(GetDlgItem(hwnd, IDC_RICHEDIT), EM_UNDO, 0, 0);
+		if (item == BM_EDIT_SELECTALL)
+		{
+			CHARRANGE charR;
+			charR.cpMin = 0;
+			charR.cpMax = -1;
+			SendMessage(GetDlgItem(hwnd, IDC_RICHEDIT), EM_EXSETSEL, 0, (LPARAM)&charR);
+		}
+		if (item == BM_EDIT_CUT) SendMessage(GetDlgItem(hwnd, IDC_RICHEDIT), WM_CUT, 0, 0);
+		if (item == BM_EDIT_COPY) SendMessage(GetDlgItem(hwnd, IDC_RICHEDIT), WM_COPY, 0, 0);
+		if (item == BM_EDIT_PASTE) SendMessage(GetDlgItem(hwnd, IDC_RICHEDIT), WM_PASTE, 0, 0);
+		if (item == BM_EDIT_DELETE) SendMessage(GetDlgItem(hwnd, IDC_RICHEDIT), WM_CLEAR, 0, 0);
+
+		DestroyMenu(hCMenu);
 	}
 	break;
 	case WM_SIZE:
@@ -200,7 +232,7 @@ BOOL CALLBACK DlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 VOID Open_File(HWND hwnd, CONST CHAR* path)
 {
 	SendMessage(GetDlgItem(hwnd, IDC_BUTTON_FILE), BM_SETSTATE, FALSE, 0);
-	DialogBoxParam(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_DIALOG1), hwnd, DlgProc, 0);
+	DialogBoxParam(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_DIALOG1), hwnd, (DLGPROC)DlgProc, 0);
 	HANDLE file = CreateFile(path, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 	if (file == INVALID_HANDLE_VALUE)
 	{
@@ -239,7 +271,7 @@ VOID Save_File(HWND hwnd, CONST CHAR* path)
 VOID SaveAs_File(HWND hwnd, CONST CHAR* path)
 {
 	SendMessage(GetDlgItem(hwnd, IDC_BUTTON_FILE), BM_SETSTATE, FALSE, 0);
-	DialogBoxParam(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_DIALOG1), hwnd, DlgProc, 0);
+	DialogBoxParam(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_DIALOG1), hwnd, (DLGPROC)DlgProc, 0);
 	HANDLE file = CreateFile(path, GENERIC_WRITE, FILE_SHARE_WRITE, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 	DWORD dwWrite;
 	DWORD size = 1 + GetWindowTextLength(GetDlgItem(hwnd, IDC_RICHEDIT));
